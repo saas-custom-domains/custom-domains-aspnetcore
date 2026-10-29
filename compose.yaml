@@ -1,0 +1,44 @@
+# docker compose up    the app + a local stand-in for SaaS Custom Domains
+services:
+  app:
+    build: .
+    ports: ["${APP_PORT:-3000}:3000"]
+    environment:
+      # "app" is how the mock (webhooks) reaches this container.
+      APP_HOSTS: localhost,app
+      APP_DOMAIN: bookwell.app
+      SCD_API_URL: http://scd-mock:4010
+      SCD_API_TOKEN: scd_test_token
+      SCD_ACCOUNT_UUID: acc_local
+      SCD_UPSTREAM_UUID: upstream_local
+      PROXY_AUTH_TOKEN: local_proxy_token
+      SCD_WEBHOOK_TOKEN: local_webhook_token
+    volumes: [data:/app/data]
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/up"]
+      interval: 2s
+      retries: 30
+
+  # Stands in for SaaS Custom Domains: the API on :4010 and the proxy
+  # on port 80, so http://anything.localhost reaches your app the way
+  # a customer's domain would.
+  scd-mock:
+    image: ghcr.io/saas-custom-domains/scd-mock:latest
+    ports:
+      - "${SCD_MOCK_API_PORT:-4010}:4010"
+      - "${SCD_MOCK_PROXY_PORT:-80}:4080"
+    environment:
+      # host.docker.internal when the app runs outside Docker
+      SCD_MOCK_UPSTREAM_HOST: ${SCD_MOCK_UPSTREAM_HOST:-app}
+      SCD_MOCK_UPSTREAM_PORT: 3000
+      SCD_MOCK_UPSTREAM_AUTH_TOKEN: local_proxy_token
+      SCD_MOCK_WEBHOOK_URL: ${SCD_MOCK_WEBHOOK_URL:-http://app:3000/webhooks/saascustomdomains}
+      SCD_MOCK_WEBHOOK_TOKEN: local_webhook_token
+      # Production always sends X-Forwarded-Proto: https. The mock speaks
+      # plain HTTP, so links the app builds locally use http.
+      SCD_MOCK_FORWARDED_PROTO: http
+      # Test domains under .test count as pointed at the proxy.
+      SCD_MOCK_VALID_HOSTS: "*.test"
+
+volumes:
+  data:

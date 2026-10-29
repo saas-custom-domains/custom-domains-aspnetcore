@@ -1,0 +1,16 @@
+@page "/bookings/{reference:guid}"
+@model BookingModel
+@using System.Globalization
+@{
+    ViewData["Title"] = Model.StudioName;
+}
+
+<h1>@Model.StudioName</h1>
+<p role="status">
+    Booked: @Model.Booking.Service on
+    @Model.Booking.StartsAt.ToString("dddd d MMMM 'at' HH:mm", CultureInfo.InvariantCulture).
+</p>
+<p>
+    We'd email you this link to manage your booking:
+    <a data-testid="manage-link" href="@Model.ManageUrl">@Model.ManageUrl</a>
+</p>

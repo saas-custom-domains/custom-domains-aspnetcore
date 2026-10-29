@@ -1,0 +1,9 @@
+bin/
+obj/
+/src/Bookwell/App_Data/
+/tests/Bookwell.E2E/playwright-traces/
+TestResults/
+.vs/
+.idea/
+*.user
+.DS_Store

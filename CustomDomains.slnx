@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Bookwell/Bookwell.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Bookwell.E2E/Bookwell.E2E.csproj" />
+    <Project Path="tests/Bookwell.Tests/Bookwell.Tests.csproj" />
+  </Folder>
+</Solution>

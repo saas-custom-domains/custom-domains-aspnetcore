@@ -1,0 +1,16 @@
+version: 2
+updates:
+  - package-ecosystem: nuget
+    directory: /
+    schedule: { interval: weekly }
+    groups:
+      aspnetcore:
+        patterns: ["Microsoft.AspNetCore.*", "Microsoft.EntityFrameworkCore.*"]
+      xunit:
+        patterns: ["xunit.*", "Microsoft.Playwright.*"]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: weekly }
+  - package-ecosystem: docker
+    directory: /
+    schedule: { interval: weekly }

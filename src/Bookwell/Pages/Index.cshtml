@@ -1,0 +1,46 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Bookwell dashboard";
+}
+
+<h1>Bookwell dashboard</h1>
+<p class="muted">Connect a custom domain to each studio's booking page.</p>
+
+@foreach (var studio in Model.Studios)
+{
+    <section data-testid="studio-@studio.Slug">
+        <h2>@studio.Name</h2>
+        <ul>
+            @foreach (var domain in studio.Domains)
+            {
+                <li data-testid="domain-@domain.Host">
+                    <span class="host">@domain.Host</span>
+                    <span class="badge @(domain.Status == DomainStatus.Active ? "active" : "")">@IndexModel.StatusLabel(domain)</span>
+                    <form method="post" asp-page-handler="Check" asp-route-id="@domain.Id">
+                        <button type="submit" class="link">Check DNS</button>
+                    </form>
+                    <form method="post" asp-page-handler="Remove" asp-route-id="@domain.Id">
+                        <button type="submit" class="link danger">Remove</button>
+                    </form>
+                </li>
+            }
+        </ul>
+        <form method="post" asp-page-handler="Add">
+            <input type="hidden" name="studioId" value="@studio.Id" />
+            <label>
+                Domain
+                <input name="host" placeholder="book.yourstudio.com" required />
+            </label>
+            <label>
+                Email for DNS instructions (optional)
+                <input name="dnsContact" type="email" placeholder="it@yourstudio.com" />
+            </label>
+            @if (Model.ErrorStudioId == studio.Id)
+            {
+                <p role="alert">@Model.Error</p>
+            }
+            <button type="submit">Add domain</button>
+        </form>
+    </section>
+}

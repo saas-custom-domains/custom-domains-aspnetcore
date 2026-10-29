@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    # Weekly, to catch breaking ASP.NET Core releases.
+    - cron: "0 6 * * 1"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+      - run: dotnet build
+      - run: dotnet test --project tests/Bookwell.Tests --no-build
+      - run: docker build .
+
+  e2e:
+    # Needs the scd-mock image, which is private for now.
+    if: ${{ !github.event.repository.private }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+      - run: dotnet build tests/Bookwell.E2E
+      - run: pwsh tests/Bookwell.E2E/bin/Debug/net10.0/playwright.ps1 install --with-deps chromium
+      - run: docker compose up -d --build --wait
+      - run: dotnet test --project tests/Bookwell.E2E --no-build
+      - if: failure()
+        run: docker compose logs

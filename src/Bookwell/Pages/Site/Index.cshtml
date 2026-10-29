@@ -1,0 +1,38 @@
+@page "/"
+@model SiteModel
+@{
+    ViewData["Title"] = Model.Studio.Name;
+}
+
+<h1>@Model.Studio.Name</h1>
+<p class="muted">@Model.Studio.Tagline</p>
+
+<section>
+    <h2>Book an appointment</h2>
+    <form method="post">
+        <label>
+            Service
+            <select asp-for="Form.Service" asp-items="@(new SelectList(Model.Studio.Services))"></select>
+        </label>
+        <label>
+            Day
+            <input asp-for="Form.Date" />
+        </label>
+        <span asp-validation-for="Form.Date" role="alert"></span>
+        <label>
+            Time
+            <select asp-for="Form.Time" asp-items="@(new SelectList(SiteModel.Times))"></select>
+        </label>
+        <label>
+            Name
+            <input asp-for="Form.Name" />
+        </label>
+        <span asp-validation-for="Form.Name" role="alert"></span>
+        <label>
+            Email
+            <input asp-for="Form.Email" />
+        </label>
+        <span asp-validation-for="Form.Email" role="alert"></span>
+        <button type="submit">Book</button>
+    </form>
+</section>
