@@ -56,7 +56,7 @@ public class DomainManagementTests(AppFactory app) : IClassFixture<AppFactory>
         var res = await AddViaDashboardAsync("book.acme-taken.test");
 
         Assert.Equal(HttpStatusCode.OK, res.StatusCode);
-        Assert.Contains("already connected to another account", await res.Content.ReadAsStringAsync(Ct));
+        Assert.Contains("connected to another account", await res.Content.ReadAsStringAsync(Ct));
         Assert.Null(await FindAsync("book.acme-taken.test"));
     }
 
@@ -129,6 +129,12 @@ public class DomainManagementTests(AppFactory app) : IClassFixture<AppFactory>
         var domain = await FindAsync("book.acme-hook.test");
         Assert.Equal(DomainStatus.Active, domain?.Status);
         Assert.True(domain?.HttpsReady);
+
+        // Deleted in the SaaS Custom Domains dashboard: gone here too.
+        var deleted = await client.PostAsJsonAsync(url,
+            new { @event = "domain_deleted", domain = new { uuid = "dom_hook" } }, Ct);
+        Assert.Equal(HttpStatusCode.NoContent, deleted.StatusCode);
+        Assert.Null(await FindAsync("book.acme-hook.test"));
 
         // Someone else's domain: acknowledged, nothing changes.
         var unknown = await client.PostAsJsonAsync(url,

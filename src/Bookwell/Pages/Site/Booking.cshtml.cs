@@ -17,7 +17,8 @@ public class BookingModel(AppDbContext db) : PageModel
     {
         var tenant = HttpContext.GetTenant()!;
         var booking = await db.Bookings.SingleOrDefaultAsync(
-            b => b.Reference == reference && b.StudioId == tenant.StudioId);
+            b => b.Reference == reference
+                && b.StudioId == tenant.StudioId);
         if (booking is null) return NotFound();
 
         Booking = booking;
@@ -25,7 +26,8 @@ public class BookingModel(AppDbContext db) : PageModel
         // An absolute URL, the kind you'd put in a confirmation email.
         // PageLink() builds it from Request.Scheme and Request.Host,
         // which CustomDomainMiddleware set to the customer's domain.
-        ManageUrl = Url.PageLink("/Site/Booking", values: new { reference })!;
+        ManageUrl = Url.PageLink(
+            "/Site/Booking", values: new { reference })!;
         return Page();
     }
 }

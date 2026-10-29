@@ -45,7 +45,8 @@ public sealed class CustomDomainOptions
         || (!string.IsNullOrEmpty(AppDomain)
             && (host == AppDomain || host.EndsWith("." + AppDomain)));
 
-    public static CustomDomainOptions FromConfiguration(IConfiguration config)
+    public static CustomDomainOptions FromConfiguration(
+        IConfiguration config)
     {
         return new CustomDomainOptions
         {

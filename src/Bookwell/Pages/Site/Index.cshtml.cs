@@ -11,7 +11,8 @@ namespace Bookwell.Pages.Site;
 [TenantSite]
 public class SiteModel(AppDbContext db) : PageModel
 {
-    public static readonly string[] Times = ["09:00", "10:30", "14:00", "16:30"];
+    public static readonly string[] Times =
+        ["09:00", "10:30", "14:00", "16:30"];
 
     public Studio Studio { get; private set; } = null!;
 
@@ -35,7 +36,7 @@ public class SiteModel(AppDbContext db) : PageModel
         if (!Times.Contains(Form.Time))
             ModelState.AddModelError("Form.Time", "Pick a time.");
         if (Form.Date < DateOnly.FromDateTime(DateTime.Today))
-            ModelState.AddModelError("Form.Date", "Pick a day from today on.");
+            ModelState.AddModelError("Form.Date", "Pick a later day.");
         if (!ModelState.IsValid) return Page();
 
         var booking = new Booking
@@ -49,13 +50,15 @@ public class SiteModel(AppDbContext db) : PageModel
         db.Bookings.Add(booking);
         await db.SaveChangesAsync();
 
-        // Redirects from RedirectToPage() are relative ("/bookings/…"),
+        // RedirectToPage() sends a relative Location ("/bookings/…"),
         // so the browser stays on the customer's domain.
-        return RedirectToPage("/Site/Booking", new { reference = booking.Reference });
+        return RedirectToPage(
+            "/Site/Booking", new { reference = booking.Reference });
     }
 
     private Task<Studio> LoadStudioAsync() =>
-        db.Studios.SingleAsync(s => s.Id == HttpContext.GetTenant()!.StudioId);
+        db.Studios.SingleAsync(
+            s => s.Id == HttpContext.GetTenant()!.StudioId);
 }
 
 public class BookingForm

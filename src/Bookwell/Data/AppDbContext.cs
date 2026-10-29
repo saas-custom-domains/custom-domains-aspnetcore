@@ -2,7 +2,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Bookwell.Data;
 
-public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
+public class AppDbContext(DbContextOptions<AppDbContext> options)
+    : DbContext(options)
 {
     public DbSet<Studio> Studios => Set<Studio>();
     public DbSet<CustomDomain> CustomDomains => Set<CustomDomain>();
@@ -14,9 +15,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
         // Every customer-facing request looks a domain up by host,
         // and a host belongs to one studio at most.
-        model.Entity<CustomDomain>().HasIndex(d => d.Host).IsUnique();
-        model.Entity<CustomDomain>().HasIndex(d => d.ProviderUuid).IsUnique();
-        model.Entity<CustomDomain>().Property(d => d.Status).HasConversion<string>();
+        var domain = model.Entity<CustomDomain>();
+        domain.HasIndex(d => d.Host).IsUnique();
+        domain.HasIndex(d => d.ProviderUuid).IsUnique();
+        domain.Property(d => d.Status).HasConversion<string>();
 
         model.Entity<Booking>().HasIndex(b => b.Reference).IsUnique();
     }
@@ -31,15 +33,21 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             {
                 Slug = "acme",
                 Name = "Acme Physio",
-                Tagline = "Sports injuries and back pain. Same-week appointments.",
-                Services = ["Initial assessment (45 min)", "Follow-up (30 min)"],
+                Tagline = "Sports injuries and back pain.",
+                Services = [
+                    "Initial assessment (45 min)",
+                    "Follow-up (30 min)",
+                ],
             },
             new Studio
             {
                 Slug = "globex",
                 Name = "Globex Yoga",
-                Tagline = "Small classes and private sessions in the old mill.",
-                Services = ["Private session (60 min)", "Beginners class (75 min)"],
+                Tagline = "Small classes in the old mill.",
+                Services = [
+                    "Private session (60 min)",
+                    "Beginners class (75 min)",
+                ],
             });
         db.SaveChanges();
     }
