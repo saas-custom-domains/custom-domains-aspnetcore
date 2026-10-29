@@ -8,9 +8,19 @@ updates:
         patterns: ["Microsoft.AspNetCore.*", "Microsoft.EntityFrameworkCore.*"]
       xunit:
         patterns: ["xunit.*", "Microsoft.Playwright.*"]
+    ignore:
+      # Stay on the .NET LTS line (10); move majors by hand.
+      - dependency-name: "Microsoft.AspNetCore.*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "Microsoft.EntityFrameworkCore.*"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: github-actions
     directory: /
     schedule: { interval: weekly }
   - package-ecosystem: docker
     directory: /
     schedule: { interval: weekly }
+    ignore:
+      # Stay on the .NET LTS line (10); move majors by hand.
+      - dependency-name: "dotnet/*"
+        update-types: ["version-update:semver-major"]
